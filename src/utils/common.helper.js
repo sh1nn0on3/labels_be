@@ -46,6 +46,7 @@ class CommonHelper {
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
     return {
+      // isValid: password.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar,
       isValid: password.length >= minLength,
       errors: {
         minLength: password.length < minLength ? 'Password must be at least 8 characters long' : null,

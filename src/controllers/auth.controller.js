@@ -1,4 +1,4 @@
-const authService = require('../services/auth.service');
+const authService = require('../services/auth/auth.service');
 const ResponseHelper = require('../utils/response.helper');
 const CommonHelper = require('../utils/common.helper');
 

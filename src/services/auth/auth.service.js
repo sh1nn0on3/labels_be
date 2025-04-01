@@ -1,6 +1,6 @@
 const { Op } = require('sequelize');
-const { User, RefreshToken } = require('../models');
-const { generateAccessToken, generateRefreshToken } = require('../utils/jwt');
+const { User, RefreshToken } = require('../../models');
+const { generateAccessToken, generateRefreshToken } = require('../../utils/jwt');
 
 class AuthService {
   async register(userData) {
