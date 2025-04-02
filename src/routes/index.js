@@ -24,7 +24,7 @@ router.use("/auth", authRoutes);
 router.use("/user", authenticateToken, userRoutes);
 
 // Admin routes (protected)
-router.use("/admin987", authenticateToken, isAdmin, adminRoutes);
+router.use("/admin", authenticateToken, isAdmin, adminRoutes);
 
 
 

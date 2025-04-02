@@ -27,6 +27,37 @@ CREATE TABLE IF NOT EXISTS RefreshTokens (
     FOREIGN KEY (userId) REFERENCES Users(id) ON DELETE CASCADE
 );
 
+-- Create ShippingPrices table
+CREATE TABLE ShippingPrices (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    minWeight DECIMAL(10, 2) NOT NULL,
+    maxWeight DECIMAL(10, 2) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    isActive BOOLEAN DEFAULT true,
+    description VARCHAR(255),
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Create ShippingOrders table
+CREATE TABLE ShippingOrders (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    userId INT NOT NULL,
+    projectName VARCHAR(255),
+    fileName VARCHAR(255) NOT NULL,
+    totalOrders INT NOT NULL DEFAULT 0,
+    totalCost DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    status ENUM('pending', 'processing', 'completed', 'rejected') DEFAULT 'pending',
+    labelUrl VARCHAR(255),
+    isTemporary BOOLEAN DEFAULT false,
+    processedAt DATETIME,
+    notes TEXT,
+    fileStorageType ENUM('local', 'drive') NOT NULL DEFAULT 'local',
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (userId) REFERENCES Users(id)
+);
+
 -- Create indexes
 CREATE INDEX idx_users_email ON Users(email);
 CREATE INDEX idx_users_username ON Users(username);

@@ -1,7 +1,11 @@
+const constants = require('./constants/appConstants');
 const express = require('express');
 const cors = require('cors');
 const sequelize = require('./config/database');
 const routes = require('./routes/index');
+const path = require('path');
+const fs = require('fs');
+const { setupCleanupScheduler } = require('./utils/file.helpers');
 require('dotenv').config();
 
 const app = express();
@@ -20,7 +24,15 @@ app.use((err, req, res, next) => {
 });
 
 // Database connection and server start
-const PORT = process.env.PORT || 3000;
+const PORT = constants.PORT || 3001;
+
+// Create temp directory if it doesn't exist
+const tempDir = path.join(__dirname, 'temp_uploads');
+if (!fs.existsSync(tempDir)) {
+  fs.mkdirSync(tempDir);
+}
+
+// setupCleanupScheduler();
 
 const startServer = async () => {
   try {
