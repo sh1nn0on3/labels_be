@@ -1,6 +1,7 @@
 const authService = require('../services/auth/auth.service');
 const ResponseHelper = require('../utils/response.helper');
 const CommonHelper = require('../utils/common.helper');
+const { logLogin, logReg } = require('../utils/auditLog.helper');
 
 class AuthController {
   async register(req, res) {
@@ -19,6 +20,7 @@ class AuthController {
       }
 
       const result = await authService.register({ username, email, password });
+      logReg(req, result.user.id, result.user.username, 'register', 'User registered successfully');
       return ResponseHelper.created(res, CommonHelper.removeSensitiveData(result));
     } catch (error) {
       return ResponseHelper.badRequest(res, error.message);
@@ -33,8 +35,9 @@ class AuthController {
       if (!CommonHelper.isValidEmail(email)) {
         return ResponseHelper.badRequest(res, 'Invalid email format');
       }
-
+      
       const result = await authService.login(email, password);
+      logLogin(req, result.user.id, result.user.username, 'login', 'User logged in successfully');
       return ResponseHelper.success(res, CommonHelper.removeSensitiveData(result));
     } catch (error) {
       return ResponseHelper.unauthorized(res, error.message);

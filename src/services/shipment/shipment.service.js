@@ -15,8 +15,8 @@ class ShipmentService {
     if (!projectName) {
       throw new Error("Project name is required");
     }
-    const user = await User.findByPk(userId);
     checkUserUploadEligibility(user);
+    const user = await User.findByPk(userId);
     const { filePath, fileName, fileType } = extractFileInfo(file);
     const data = await parseFileData(filePath, fileType);
     const processedData = await validateAndProcessData(data);

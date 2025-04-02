@@ -58,6 +58,18 @@ CREATE TABLE ShippingOrders (
     FOREIGN KEY (userId) REFERENCES Users(id)
 );
 
+CREATE TABLE AuditLogs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    userId INT,
+    username VARCHAR(30),
+    action VARCHAR(50) NOT NULL,
+    details TEXT,
+    ipAddress VARCHAR(45),
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (userId) REFERENCES Users(id)
+);
+
 -- Create indexes
 CREATE INDEX idx_users_email ON Users(email);
 CREATE INDEX idx_users_username ON Users(username);

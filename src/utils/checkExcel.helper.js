@@ -32,8 +32,9 @@ const validateAndProcessData = async (data) => {
 
 
 const checkUserUploadEligibility = (user) => {
-  if (user.balance < 0) {
-    throw new Error("User balance is negative, cannot upload file.");
+  console.log("🚀 ~ checkUserUploadEligibility ~ user:", user.balance)
+  if (user.balance < 1) {
+    throw new Error("Transaction cannot be completed due to insufficient balance.");
   }
   return true;
 };
