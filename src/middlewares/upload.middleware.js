@@ -19,14 +19,18 @@ const storage = multer.diskStorage({
 // File filter to only allow csv and xlsx files
 const fileFilter = (req, file, cb) => {
   const allowedTypes = constants.ALLOWED_TYPES_CSV;
+  const allowedLabelTypes = constants.ALLOWED_LABEL_TYPES;
 
   const ext = path.extname(file.originalname).toLowerCase();
   const mimetype = file.mimetype;
 
-  if (allowedTypes[ext] && mimetype === allowedTypes[ext]) {
+  // Check if the file is a label file or a shipment file
+  if ((allowedTypes[ext] && mimetype === allowedTypes[ext]) || 
+      (allowedLabelTypes[ext] && mimetype === allowedLabelTypes[ext])) {
     cb(null, true);
   } else {
-    cb(new Error("Only .csv and .xlsx files are allowed"), false);
+    const allowedExtensions = [...Object.keys(allowedTypes), ...Object.keys(allowedLabelTypes)].join(', ');
+    cb(new Error(`Invalid file type. Allowed types: ${allowedExtensions}`), false);
   }
 };
 

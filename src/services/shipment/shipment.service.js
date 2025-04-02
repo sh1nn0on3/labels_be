@@ -9,6 +9,7 @@ const ShippingOrder = require("../../models/shippingOrder.model");
 const constants = require("../../constants/appConstants");
 const fs = require("fs");
 const sequelize = require("../../config/database");
+const path = require("path");
 
 class ShipmentService {
   async createShipment(userId, file, shipmentData) {
@@ -207,6 +208,78 @@ class ShipmentService {
     });
     return shipments;
   }
+
+  async createShipmentLabel(userId, file, shipmentId) {
+    const shipment = await ShippingOrder.findOne({
+      where: {
+        id: shipmentId,
+        userId: userId,
+        isTemporary: false,
+      },
+    });
+    if (!shipment) {
+      throw new Error("Shipment not found");
+    }
+
+    // Create labels directory if it doesn't exist
+    const labelsDir = constants.LABELS_DIR;
+    if (!fs.existsSync(labelsDir)) {
+      fs.mkdirSync(labelsDir, { recursive: true });
+    }
+
+    const fileInfo = extractFileInfo(file);
+    const filePath = fileInfo.filePath;
+    const fileName = fileInfo.fileName;
+    
+    // Move file to labels directory
+    const newFilePath = path.join(labelsDir, fileName);
+    fs.renameSync(filePath, newFilePath);
+    
+    // Update labelUrl in database - append new filename to existing ones
+    let labelUrls = shipment.labelUrl ? shipment.labelUrl.split(',') : [];
+    labelUrls.push(fileName);
+    
+    shipment.labelUrl = labelUrls.join(',');
+    await shipment.save();
+
+    return shipment;
+  }
+
+  async createShipmentLabelAdmin(file, shipmentId) {
+    const shipment = await ShippingOrder.findOne({
+      where: {
+        id: shipmentId,
+        isTemporary: false,
+      },
+    });
+    if (!shipment) {
+      throw new Error("Shipment not found");
+    }
+
+    // Create labels directory if it doesn't exist
+    const labelsDir = constants.LABELS_DIR;
+    if (!fs.existsSync(labelsDir)) {
+      fs.mkdirSync(labelsDir, { recursive: true });
+    }
+
+    const fileInfo = extractFileInfo(file);
+    const filePath = fileInfo.filePath;
+    const fileName = fileInfo.fileName;
+    
+    // Move file to labels directory
+    const newFilePath = path.join(labelsDir, fileName);
+    fs.renameSync(filePath, newFilePath);
+    
+    // Update labelUrl in database - append new filename to existing ones
+    let labelUrls = shipment.labelUrl ? shipment.labelUrl.split(',') : [];
+    labelUrls.push(fileName);
+    
+    shipment.labelUrl = labelUrls.join(',');
+    await shipment.save();
+
+    return shipment;
+  }
+
 }
 
 module.exports = new ShipmentService();

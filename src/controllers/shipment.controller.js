@@ -119,6 +119,37 @@ class shipmentController{
         }
     }
 
+    async createShipmentLabel(req, res) {
+        const shipmentId = req.params.id;
+        const file = req.file; // Assuming the file is available in req.file
+        const userId = req.user.id;
+        try {
+            if (!file) {
+                return ResponseHelper.badRequest(res, 'No file uploaded');
+            }
+            const result = await shipmentService.createShipmentLabel(userId, file, shipmentId);
+            const fileUrl = `${constants.DOMAIN}/uploads/labels/${result.labelUrl.split(',').pop()}`;
+            return ResponseHelper.success(res, { fileUrl }, 'Shipment label created successfully');
+        } catch (error) {
+            return ResponseHelper.error(res, error.message);
+        }
+    }
+
+    async createShipmentLabelAdmin(req, res) {
+        const shipmentId = req.params.id;
+        const file = req.file; // Assuming the file is available in req.file
+        try {
+            if (!file) {
+                return ResponseHelper.badRequest(res, 'No file uploaded');
+            }
+            const result = await shipmentService.createShipmentLabelAdmin(file, shipmentId);
+            const fileUrl = `${constants.DOMAIN}/uploads/labels/${result.labelUrl.split(',').pop()}`;
+            return ResponseHelper.success(res, { fileUrl }, 'Shipment label created successfully');
+        } catch (error) {
+            return ResponseHelper.error(res, error.message);
+        }
+    }
+
 }
 
 module.exports = new shipmentController();
