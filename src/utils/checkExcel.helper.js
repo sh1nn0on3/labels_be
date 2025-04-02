@@ -32,7 +32,6 @@ const validateAndProcessData = async (data) => {
 
 
 const checkUserUploadEligibility = (user) => {
-  console.log("🚀 ~ checkUserUploadEligibility ~ user:", user.balance)
   if (user.balance < 1) {
     throw new Error("Transaction cannot be completed due to insufficient balance.");
   }

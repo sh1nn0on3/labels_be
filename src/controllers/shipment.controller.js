@@ -1,3 +1,4 @@
+const constants = require("../constants/appConstants");
 const shipmentService = require("../services/shipment/shipment.service");
 const { logCreateShipment } = require("../utils/auditLog.helper");
 const ResponseHelper = require("../utils/response.helper");
@@ -15,8 +16,9 @@ class shipmentController{
             if (!shipmentData) {
                 return ResponseHelper.badRequest(res, 'No shipment data provided');
             }
-            const result = await shipmentService.createShipment(userId, file , shipmentData);
-            logCreateShipment(req, userId, req.user.username, 'success' ,'create_shipment', 'Shipment created successfully');
+            const result = await shipmentService.createShipment(userId, file, shipmentData);
+            const fileUrl = `${constants.DOMAIN}/${result.fileName}`;
+            logCreateShipment(req, userId, req.user.username, 'success', 'create_shipment', `Shipment created successfully with ID: ${result.id}, File: ${fileUrl}, and Data: ${JSON.stringify(result)}`);
             return ResponseHelper.success(res, result, 'Shipment created successfully');
         } catch (error) {
             logCreateShipment(req, userId, req.user.username, 'error','create_shipment', error.message);

@@ -2,6 +2,7 @@ const path = require("path");
 
 const constants = {
   PORT : process.env.PORT || 3000,
+  DOMAIN : process.env.DOMAIN || "http://localhost:3000",
 
   TEMP_UPLOADS_DIR: path.join(__dirname, "..", "temp_uploads"),
   TEMP_DATA_DIR: path.join(__dirname, "..", "temp_data"),

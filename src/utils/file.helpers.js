@@ -5,30 +5,18 @@ const xlsx = require("xlsx");
 const constants = require("../constants/appConstants");
 
 // Parse CSV files
-exports.parseCSV = (filePath) => {
-  return new Promise((resolve, reject) => {
-    const data = [];
-    fs.readFile(filePath, "utf8")
-      .then((fileContent) => {
-        parse(fileContent, {
-          columns: true,
-          skip_empty_lines: true,
-          trim: true,
-        })
-          .on("data", (row) => {
-            data.push(row);
-          })
-          .on("end", () => {
-            resolve(data);
-          })
-          .on("error", (err) => {
-            reject(new Error(`Lỗi khi phân tích tập tin CSV: ${err.message}`));
-          });
-      })
-      .catch((err) => {
-        reject(new Error(`Không thể đọc tập tin: ${err.message}`));
-      });
-  });
+exports.parseCSV = async (filePath) => {
+  try {
+    const fileContent = await fs.readFile(filePath, "utf8");
+    const records = parse(fileContent, {
+      columns: true,
+      skip_empty_lines: true,
+      trim: true,
+    });
+    return records;
+  } catch (err) {
+    throw new Error(`Lỗi khi xử lý tập tin CSV: ${err.message}`);
+  }
 };
 
 // Parse XLSX files
