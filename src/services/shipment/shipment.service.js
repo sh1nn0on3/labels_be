@@ -8,6 +8,8 @@ const {
 } = require("../../utils/checkExcel.helper");
 const ShippingOrder = require("../../models/shippingOrder.model");
 const constants = require("../../constants/appConstants");
+const fs = require('fs');
+const path = require('path');
 
 class ShipmentService {
   async createShipment(userId, file, shipmentData) {
@@ -15,11 +17,26 @@ class ShipmentService {
     if (!projectName) {
       throw new Error("Project name is required");
     }
-    checkUserUploadEligibility(user);
+
     const user = await User.findByPk(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    checkUserUploadEligibility(user);
     const { filePath, fileName, fileType } = extractFileInfo(file);
     const data = await parseFileData(filePath, fileType);
     const processedData = await validateAndProcessData(data);
+
+    // Check if user has sufficient balance
+    if (user.balance < processedData.totalPrice) {
+      // Delete the uploaded file if balance is insufficient
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      throw new Error("Insufficient balance to process this shipment");
+    }
+
     const fileStorageType = constants.FILE_STORAGE_TYPES;
     const shippingOrder = await ShippingOrder.create({
       userId,
@@ -32,6 +49,11 @@ class ShipmentService {
       fileStorageType: fileStorageType,
       processedAt: new Date(),
       notes: notes || "",
+    });
+
+    // Update user's balance
+    await user.update({
+      balance: user.balance - processedData.totalPrice
     });
 
     return shippingOrder;

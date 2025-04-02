@@ -19,6 +19,10 @@ const AuditLog = sequelize.define("AuditLog", {
     type: sequelize.Sequelize.STRING,
     allowNull: false,
   },
+  status:{
+    type: sequelize.Sequelize.STRING,
+    allowNull: false,
+  },
   details: {
     type: sequelize.Sequelize.TEXT,
     allowNull: true,

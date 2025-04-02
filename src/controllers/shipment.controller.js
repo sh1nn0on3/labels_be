@@ -1,23 +1,25 @@
 const shipmentService = require("../services/shipment/shipment.service");
+const { logCreateShipment } = require("../utils/auditLog.helper");
 const ResponseHelper = require("../utils/response.helper");
 
 
 class shipmentController{
     async createShipment(req, res) {
+        const userId = req.user.id;
+        const shipmentData = req.body;
+        const file = req.file; // Assuming the file is available in req.file
         try {
-            const userId = req.user.id;
-            const shipmentData = req.body;
-            const file = req.file; // Assuming the file is available in req.file
             if (!file) {
                 return ResponseHelper.badRequest(res, 'No file uploaded');
             }
             if (!shipmentData) {
                 return ResponseHelper.badRequest(res, 'No shipment data provided');
             }
-
             const result = await shipmentService.createShipment(userId, file , shipmentData);
+            logCreateShipment(req, userId, req.user.username, 'success' ,'create_shipment', 'Shipment created successfully');
             return ResponseHelper.success(res, result, 'Shipment created successfully');
         } catch (error) {
+            logCreateShipment(req, userId, req.user.username, 'error','create_shipment', error.message);
             return ResponseHelper.error(res, error.message);
         }
     }
