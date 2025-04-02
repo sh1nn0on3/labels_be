@@ -4,6 +4,7 @@ const uploadMiddleware = require("../middlewares/upload.middleware");
 const userController = require("../controllers/user.controller");
 const uploadController = require("../controllers/upload.controller");
 const shipmentController = require("../controllers/shipment.controller");
+const balanceController = require("../controllers/balance.controller");
 
 
 // User routes
@@ -16,5 +17,7 @@ router.get("/shipments", shipmentController.getShipments);
 router.get("/shipment/:id", shipmentController.getShipmentById);
 router.delete("/shipment/:id", shipmentController.deleteShipment);
 router.get("/shipment/status/:status", shipmentController.getShipmentByStatus);
+
+router.post('/deposit', balanceController.deposit);
 
 module.exports = router;

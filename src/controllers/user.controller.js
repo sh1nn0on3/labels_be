@@ -1,5 +1,6 @@
 const ResponseHelper = require('../utils/response.helper');
 const UserService = require('../services/user/userService');
+const BalanceService = require('../services/balance/balance.service');
 
 class UserController {
     async getProfile(req, res) {
