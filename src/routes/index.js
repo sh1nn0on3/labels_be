@@ -3,6 +3,7 @@ const router = express.Router();
 const authRoutes = require("./auth.routes");
 const adminRoutes = require("./admin.routes");
 const userRoutes = require("./user.routes");
+const balanceController = require("../controllers/balance.controller");
 
 const {
   authenticateToken,
@@ -19,6 +20,8 @@ router.get("/health", (req, res) => {
 
 // API routes
 router.use("/auth", authRoutes);
+
+router.post('/webhook', express.raw({type: 'application/json'}), balanceController.handleWebhook);
 
 // User routes (protected)
 router.use("/user", authenticateToken, userRoutes);

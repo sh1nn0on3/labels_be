@@ -9,11 +9,11 @@ class ResponseHelper {
   }
 
   static created(res, data = null, message = 'Created successfully') {
-    return this.success(res, data, message, 201);
+    return this.success(res, data, message, 200);
   }
 
   // Error responses
-  static error(res, message = 'Something went wrong', statusCode = 500) {
+  static error(res, message = 'Something went wrong', statusCode = 200) {
     return res.status(statusCode).json({
       success: false,
       message
@@ -21,24 +21,24 @@ class ResponseHelper {
   }
 
   static badRequest(res, message = 'Bad request') {
-    return this.error(res, message, 400);
+    return this.error(res, message, 200);
   }
 
   static unauthorized(res, message = 'Unauthorized') {
-    return this.error(res, message, 401);
+    return this.error(res, message, 200);
   }
 
   static forbidden(res, message = 'Forbidden') {
-    return this.error(res, message, 403);
+    return this.error(res, message, 200);
   }
 
   static notFound(res, message = 'Not found') {
-    return this.error(res, message, 404);
+    return this.error(res, message, 200);
   }
 
   // Validation error response
   static validationError(res, errors) {
-    return res.status(400).json({
+    return res.status(200).json({
       success: false,
       message: 'Validation error',
       errors

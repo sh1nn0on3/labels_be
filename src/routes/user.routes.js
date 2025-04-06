@@ -24,7 +24,6 @@ router.post('/deposit', balanceController.deposit);
 router.post('/create-checkout-session', balanceController.createCheckoutSession);
 
 // Stripe webhook route (no auth middleware needed)
-router.post('/webhook', express.raw({type: 'application/json'}), balanceController.handleWebhook);
 
 // notification routes
 router.get('/notifications', notificationController.getActiveNotifications); // Assuming you have a method to get active notifications
