@@ -17,7 +17,6 @@ class AuthService {
     const user = await User.create(userData);
     return {
       user: {
-        id: user.id,
         username: user.username,
         email: user.email,
         role: user.role
@@ -47,7 +46,6 @@ class AuthService {
 
     return {
       user: {
-        id: user.id,
         username: user.username,
         email: user.email,
         role: user.role
