@@ -18,6 +18,8 @@ async function logLogin(
       req.socket?.remoteAddress ||
       "Unknown";
 
+      console.log("IP Address:", userId ?? '-999'); 
+
     await AuditLog.create({
       userId,
       username,

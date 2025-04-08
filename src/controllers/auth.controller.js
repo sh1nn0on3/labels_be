@@ -20,7 +20,6 @@ class AuthController {
       }
 
       const result = await authService.register({ username, email, password });
-      logReg(req, result.user.id, result.user.username, 'register', 'User registered successfully');
       return ResponseHelper.created(res, CommonHelper.removeSensitiveData(result));
     } catch (error) {
       return ResponseHelper.badRequest(res, error.message);
@@ -37,7 +36,6 @@ class AuthController {
       }
       
       const result = await authService.login(email, password);
-      logLogin(req, result.user.id, result.user.username, 'login', 'User logged in successfully');
       return ResponseHelper.success(res, CommonHelper.removeSensitiveData(result));
     } catch (error) {
       return ResponseHelper.unauthorized(res, error.message);

@@ -1,6 +1,7 @@
 const { Op } = require('sequelize');
 const { User, RefreshToken } = require('../../models');
 const { generateAccessToken, generateRefreshToken } = require('../../utils/jwt');
+const { logLogin } = require('../../utils/auditLog.helper');
 
 class AuthService {
   async register(userData) {
@@ -43,13 +44,7 @@ class AuthService {
       userId: user.id,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
     });
-
     return {
-      user: {
-        username: user.username,
-        email: user.email,
-        role: user.role
-      },
       accessToken,
       refreshToken
     };
