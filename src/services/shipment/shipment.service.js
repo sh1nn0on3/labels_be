@@ -29,7 +29,8 @@ class ShipmentService {
       checkUserUploadEligibility(user);
       const fileInfo = extractFileInfo(file);
       filePath = fileInfo.filePath;
-      const { fileName, fileType } = fileInfo;
+      const fileName = fileInfo.fileName;
+      const fileType = fileInfo.fileType;
 
       const data = await parseFileData(filePath, fileType);
       const processedData = await validateAndProcessData(data);
@@ -87,6 +88,14 @@ class ShipmentService {
         );
 
         await t.commit();
+
+        const projectDir = constants.TEMP_DATA_DIR;
+        if (!fs.existsSync(projectDir)) {
+          fs.mkdirSync(projectDir, { recursive: true });
+        }
+        const newFilePath = path.join(projectDir, fileName);
+        fs.renameSync(filePath, newFilePath);
+
         return shippingOrder;
       } catch (error) {
         await t.rollback();

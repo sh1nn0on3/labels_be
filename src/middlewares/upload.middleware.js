@@ -7,7 +7,7 @@ const ResponseHelper = require("../utils/response.helper");
 // Configure multer storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "..", "temp_uploads"));
+    cb(null, constants.TEMP_UPLOADS_DIR);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = crypto.randomBytes(8).toString("hex");

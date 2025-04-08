@@ -17,6 +17,8 @@ app.use(express.json());
 // Routes
 app.use('/api', routes);
 
+setupCleanupScheduler(); 
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
