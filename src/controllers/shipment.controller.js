@@ -29,12 +29,21 @@ class shipmentController{
     async getShipments(req, res) {
         try {
             const userId = req.user.id;
-            const shipments = await shipmentService.getShipments(userId);
-            return ResponseHelper.success(res, shipments, 'Shipments retrieved successfully');
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 10;
+            
+            const { shipments, pagination } = await shipmentService.getShipments(userId, page, limit);
+            
+            return ResponseHelper.success(
+                res, 
+                { shipments, pagination }, 
+                'Shipments retrieved successfully'
+            );
         } catch (error) {
             return ResponseHelper.error(res, error.message);
         }
     }
+    
 
     async getShipmentById(req, res) {
         try {
@@ -72,12 +81,28 @@ class shipmentController{
     // ADMIN SHIPMENT FUNCTIONS
     async getAllShipments(req, res) {
         try {
-            const shipments = await shipmentService.getAllShipments();
-            return ResponseHelper.success(res, shipments, 'All shipments retrieved successfully');
+            const page = parseInt(req.query.page) || 1; // Trang mặc định là 1
+            const limit = parseInt(req.query.limit) || 10; // Số lượng item mỗi trang mặc định là 10
+            
+            const { shipments, total, totalPages } = await shipmentService.getAllShipments(page, limit);
+            
+            return ResponseHelper.success(res, 
+                { 
+                    shipments, 
+                    pagination: {
+                        total,
+                        totalPages,
+                        currentPage: page,
+                        limit
+                    } 
+                }, 
+                'All shipments retrieved successfully'
+            );
         } catch (error) {
             return ResponseHelper.error(res, error.message);
         }
     }
+    
 
     async getShipmentByIdAdmin(req, res) {
         try {
@@ -89,11 +114,11 @@ class shipmentController{
         }
     }
 
-    async updateShipmentStatus(req, res) {
+    async updateShipment(req, res) {
         try {
             const shipmentId = req.params.id;
-            const status = req.body.status;
-            const result = await shipmentService.updateShipmentStatus(shipmentId, status);
+            const data = req.body;
+            const result = await shipmentService.updateShipment(shipmentId, data);
             return ResponseHelper.success(res, result, 'Shipment status updated successfully');
         } catch (error) {
             return ResponseHelper.error(res, error.message);
@@ -120,7 +145,7 @@ class shipmentController{
     }
 
     async createShipmentLabel(req, res) {
-        const shipmentId = req.params.id;
+        const shipmentId = req.body.shipmentId;
         const file = req.file; // Assuming the file is available in req.file
         const userId = req.user.id;
         try {
@@ -128,7 +153,7 @@ class shipmentController{
                 return ResponseHelper.badRequest(res, 'No file uploaded');
             }
             const result = await shipmentService.createShipmentLabel(userId, file, shipmentId);
-            const fileUrl = `${constants.DOMAIN}/uploads/labels/${result.labelUrl.split(',').pop()}`;
+            const fileUrl = `${constants.DOMAIN}/labels/${result.labelUrl.split(',').pop()}`;
             return ResponseHelper.success(res, { fileUrl }, 'Shipment label created successfully');
         } catch (error) {
             return ResponseHelper.error(res, error.message);
@@ -145,6 +170,17 @@ class shipmentController{
             const result = await shipmentService.createShipmentLabelAdmin(file, shipmentId);
             const fileUrl = `${constants.DOMAIN}/uploads/labels/${result.labelUrl.split(',').pop()}`;
             return ResponseHelper.success(res, { fileUrl }, 'Shipment label created successfully');
+        } catch (error) {
+            return ResponseHelper.error(res, error.message);
+        }
+    }
+    
+    async searchShipments(req, res) {
+        try {
+            const userId = req.user.id;
+            const query = req.query.q; // Assuming the search query is passed as a query parameter
+            const shipments = await shipmentService.searchShipments(userId, query);
+            return ResponseHelper.success(res, shipments, 'Shipments retrieved successfully');
         } catch (error) {
             return ResponseHelper.error(res, error.message);
         }

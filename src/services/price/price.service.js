@@ -29,10 +29,36 @@ async function validateShippingPrice(data) {
 }
 
 class PriceService {
-  async getShippingPrice() {
+  async getShippingPrice(page = 1, limit = 10) {
     try {
-      const shippingPrice = await ShippingPrice.findAll();
-      return shippingPrice;
+      // Calculate offset for pagination
+      const offset = (page - 1) * limit;
+      
+      // Get total count
+      const count = await ShippingPrice.count();
+      
+      // Get paginated shipping prices
+      const shippingPrices = await ShippingPrice.findAll({
+        offset,
+        limit,
+        order: [['id', 'ASC']] // You can change the ordering as needed
+      });
+      
+      // Calculate pagination metadata
+      const totalPages = Math.ceil(count / limit);
+      
+      // Return formatted response with pagination data
+      return {
+        shippingPrices,
+        pagination: {
+          total: count,
+          totalPages,
+          currentPage: page,
+          limit,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1
+        }
+      };
     } catch (error) {
       throw new Error("Error fetching shipping price: " + error.message);
     }

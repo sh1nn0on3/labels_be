@@ -115,15 +115,27 @@ class ShipmentService {
     }
   }
 
-  async getShipments(userId) {
-    const shipments = await ShippingOrder.findAll({
+  async getShipments(userId, page = 1, limit = 10) {
+    const offset = (page - 1) * limit;
+    const { count, rows: shipments } = await ShippingOrder.findAndCountAll({
       where: {
         userId: userId,
         isTemporary: false,
       },
       order: [["createdAt", "DESC"]],
+      limit: limit,
+      offset: offset,
     });
-    return shipments;
+    const totalPages = Math.ceil(count / limit);
+    const pagination = {
+      total: count,
+      currentPage: page,
+      totalPages: totalPages,
+      limit: limit,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1,
+    };
+    return { shipments, pagination };
   }
 
   async getShipmentById(userId, shipmentId) {
@@ -169,14 +181,28 @@ class ShipmentService {
   }
 
   // ADMIN SHIPMENT FUNCTIONS
-  async getAllShipments() {
-    const shipments = await ShippingOrder.findAll({
+  async getAllShipments(page = 1, limit = 10) {
+    // Tính toán offset dựa trên page và limit
+    const offset = (page - 1) * limit;
+
+    // Lấy dữ liệu với phân trang
+    const { count, rows } = await ShippingOrder.findAndCountAll({
       where: {
         isTemporary: false,
       },
       order: [["createdAt", "DESC"]],
+      limit: limit,
+      offset: offset,
     });
-    return shipments;
+
+    // Tính toán tổng số trang
+    const totalPages = Math.ceil(count / limit);
+
+    return {
+      shipments: rows,
+      total: count,
+      totalPages: totalPages,
+    };
   }
 
   async getShipmentByIdAdmin(shipmentId) {
@@ -189,6 +215,13 @@ class ShipmentService {
     if (!shipment) {
       throw new Error("Shipment not found");
     }
+    const fileName = `${constants.DOMAIN}/uploads/${shipment.fileName}`;
+    shipment.fileName = fileName;
+
+    const labelUrls = shipment.labelUrl ? shipment.labelUrl.split(",") : [];
+    const labelUrlsWithDomain = labelUrls.map((url) => `${constants.DOMAIN}/labels/${url}`);
+    shipment.labelUrl = labelUrlsWithDomain.join(",");
+    
     return shipment;
   }
 
@@ -239,16 +272,16 @@ class ShipmentService {
     const fileInfo = extractFileInfo(file);
     const filePath = fileInfo.filePath;
     const fileName = fileInfo.fileName;
-    
+
     // Move file to labels directory
     const newFilePath = path.join(labelsDir, fileName);
     fs.renameSync(filePath, newFilePath);
-    
+
     // Update labelUrl in database - append new filename to existing ones
-    let labelUrls = shipment.labelUrl ? shipment.labelUrl.split(',') : [];
+    let labelUrls = shipment.labelUrl ? shipment.labelUrl.split(",") : [];
     labelUrls.push(fileName);
-    
-    shipment.labelUrl = labelUrls.join(',');
+
+    shipment.labelUrl = labelUrls.join(",");
     await shipment.save();
 
     return shipment;
@@ -274,21 +307,91 @@ class ShipmentService {
     const fileInfo = extractFileInfo(file);
     const filePath = fileInfo.filePath;
     const fileName = fileInfo.fileName;
-    
+
     // Move file to labels directory
     const newFilePath = path.join(labelsDir, fileName);
     fs.renameSync(filePath, newFilePath);
-    
+
     // Update labelUrl in database - append new filename to existing ones
-    let labelUrls = shipment.labelUrl ? shipment.labelUrl.split(',') : [];
+    let labelUrls = shipment.labelUrl ? shipment.labelUrl.split(",") : [];
     labelUrls.push(fileName);
-    
-    shipment.labelUrl = labelUrls.join(',');
+
+    shipment.labelUrl = labelUrls.join(",");
     await shipment.save();
 
     return shipment;
   }
 
+  async searchShipments(userId, searchTerm) {
+    const { q, status, page = 1, limit = 20 } = searchTerm;
+    const offset = (page - 1) * limit;
+  
+    const whereCondition = {
+      userId,
+      isTemporary: false,
+    };
+  
+    if (q && q.trim() !== "") {
+      whereCondition.projectName = { [sequelize.Op.like]: `%${q.trim()}%` };
+    }
+  
+    if (status && status.toLowerCase() !== "all") {
+      whereCondition.status = { [sequelize.Op.like]: `%${status}%` };
+    }
+  
+    const { count, rows: shipments } = await ShippingOrder.findAndCountAll({
+      where: whereCondition,
+      order: [["createdAt", "DESC"]],
+      limit,
+      offset,
+    });
+  
+    const totalPages = Math.ceil(count / limit);
+    const pagination = {
+      total: count,
+      currentPage: page,
+      totalPages,
+      limit,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1,
+    };
+  
+    return { shipments, pagination };
+  }
+
+  async updateShipment(shipmentId, data) {
+    const shipment = await ShippingOrder.findOne({
+      where: {
+        id: shipmentId,
+        isTemporary: false,
+      },
+    });
+    if (!shipment) {
+      throw new Error("Shipment not found");
+    }
+    const {labels, status, notes } = data;
+
+    const fileNames = labels.map(label => {
+      return label.split('/').pop(); // lấy phần cuối cùng sau dấu /
+    });
+
+    const labelUrl = fileNames.join(', ');
+
+    if (labelUrl) {
+      shipment.labelUrl = labelUrl;
+    }
+    if (status) {
+      shipment.status = status;
+    }
+    if (notes) {
+      shipment.notes = notes;
+    }
+    await shipment.save();    
+    return shipment;
+  }
+
 }
+
+
 
 module.exports = new ShipmentService();

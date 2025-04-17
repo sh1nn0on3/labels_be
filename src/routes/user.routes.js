@@ -6,22 +6,25 @@ const uploadController = require("../controllers/upload.controller");
 const shipmentController = require("../controllers/shipment.controller");
 const balanceController = require("../controllers/balance.controller");
 const notificationController = require('../controllers/notification.controller');
+const { decryptMiddleware } = require("../middlewares/decode.middleware");
 
 // User routes
+router.get('/dashboard', userController.getDashboard);
 router.get("/profile", userController.getProfile);
-router.put("/change-password", userController.changePassword);
-router.post("/upload", uploadMiddleware, uploadController.uploadFile);
+router.put("/change-password", decryptMiddleware, userController.changePassword);
+router.post("/upload", uploadMiddleware, decryptMiddleware ,uploadController.uploadFile);
 
 // Shipment routes
-router.post("/shipments", uploadMiddleware, shipmentController.createShipment); 
+router.post("/shipments", uploadMiddleware, decryptMiddleware ,shipmentController.createShipment); 
 router.get("/shipments", shipmentController.getShipments);
 router.get("/shipment/:id", shipmentController.getShipmentById);
 router.delete("/shipment/:id", shipmentController.deleteShipment);
 router.get("/shipment/status/:status", shipmentController.getShipmentByStatus);
+router.get("/shipment/search", shipmentController.searchShipments);
 
 // Balance routes
-router.post('/deposit', balanceController.deposit);
-router.post('/create-checkout-session', balanceController.createCheckoutSession);
+router.post('/deposit',decryptMiddleware  ,balanceController.deposit);
+router.post('/create-checkout-session', decryptMiddleware , balanceController.createCheckoutSession);
 
 // Stripe webhook route (no auth middleware needed)
 

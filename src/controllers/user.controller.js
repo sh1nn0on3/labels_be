@@ -23,6 +23,17 @@ class UserController {
         return ResponseHelper.error(res, error.message);
         }
     }
+
+    async getDashboard(req, res) {
+        try {
+            const userId = req.user.id; 
+            const dashboardData = await UserService.getDashboard(userId);
+            return ResponseHelper.success(res, dashboardData);
+        } catch (error) {
+            return ResponseHelper.error(res, error.message);
+        }
+    }
+
 }
 
 module.exports = new UserController(); 

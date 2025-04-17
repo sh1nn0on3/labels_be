@@ -36,6 +36,7 @@ class AuthService {
       throw new Error('Invalid password');
     }
 
+    delete user.dataValues.balance;
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 
@@ -71,6 +72,7 @@ class AuthService {
     }
 
     const user = await User.findByPk(refreshToken.userId);
+    delete user.dataValues.balance;
     const newAccessToken = generateAccessToken(user);
     const newRefreshToken = generateRefreshToken(user);
 

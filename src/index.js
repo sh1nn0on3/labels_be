@@ -14,6 +14,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use('/labels', express.static(path.join(__dirname, 'uploads/labels')));
+app.use('/uploads', express.static(path.join(__dirname, 'temp_data')));
 // Routes
 app.use('/api', routes);
 

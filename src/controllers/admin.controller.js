@@ -6,7 +6,11 @@ class AdminController {
   // User Management
   async getUsers(req, res) {
     try {
-      const users = await UserService.getAllUsers();
+      // Get pagination parameters from query string
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const users = await UserService.getAllUsers(page, limit);
       return ResponseHelper.success(res, users);
     } catch (error) {
       return ResponseHelper.error(res, error.message);
@@ -57,8 +61,14 @@ class AdminController {
   // Price Management
   async getPrice(req, res) {
     try {
-      const price = await priceService.getShippingPrice();
-      return ResponseHelper.success(res, price);
+      // Extract pagination parameters from query
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      
+      // Get paginated shipping prices
+      const result = await priceService.getShippingPrice(page, limit);
+      
+      return ResponseHelper.success(res, result);
     } catch (error) {
       return ResponseHelper.error(res, error.message);
     }
@@ -104,10 +114,6 @@ class AdminController {
       return ResponseHelper.error(res, error.message);
     }
   }
-
-
-  
-
 }
 
 module.exports = new AdminController();

@@ -43,7 +43,7 @@ const ShippingOrder = sequelize.define('ShippingOrder', {
     defaultValue: 'local'
   },
   status: {
-    type: DataTypes.ENUM('pending', 'processing', 'completed', 'rejected'),
+    type: DataTypes.ENUM('pending', 'processing', 'completed', 'rejected' , 'hold'),
     defaultValue: 'pending'
   },
   isTemporary: {

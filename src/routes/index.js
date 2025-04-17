@@ -16,8 +16,6 @@ router.get("/health", (req, res) => {
 });
 
 
-
-
 // API routes
 router.use("/auth", authRoutes);
 

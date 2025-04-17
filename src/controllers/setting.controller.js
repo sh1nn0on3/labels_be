@@ -8,7 +8,7 @@ exports.createSetting = async (req, res) => {
       setting_name: req.body.setting_name,
       setting_key: req.body.setting_key,
       setting_value: req.body.setting_value,
-      setting_type: req.body.setting_type,
+      setting_type: req.body.setting_type || "string",
       setting_status: req.body.setting_status || 'active'
     };
     
@@ -32,6 +32,7 @@ exports.getAllSettings = async (req, res) => {
     return ResponseHelper.error(res, error.message);
   }
 };
+
 
 // Get setting by ID
 exports.getSettingById = async (req, res) => {
