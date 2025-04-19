@@ -11,8 +11,8 @@ const {
 } = require("../middlewares/auth.middleware");
 
 // Health check route
-router.get("/health", (req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+router.get("/ping", (req, res) => {
+  res.json({ status: "pong", timestamp: new Date().toISOString() });
 });
 
 
