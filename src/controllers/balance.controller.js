@@ -1,6 +1,7 @@
 const balanceService = require("../services/balance/balance.service");
 const stripeService = require("../services/stripe/stripe.service");
 const ResponseHelper = require("../utils/response.helper");
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 class balanceController {
   async deposit(req, res) {
@@ -37,11 +38,16 @@ class balanceController {
   async handleWebhook(req, res) {
     try {
       const sig = req.headers["stripe-signature"];
+      // req.body is now a Buffer when using express.raw middleware
+      const payload = req.body;
+      const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+      
       const event = stripe.webhooks.constructEvent(
-        req.body,
+        payload,
         sig,
-        process.env.STRIPE_WEBHOOK_SECRET
+        webhookSecret
       );
+      console.log("Received webhook event:", event);
 
       await stripeService.handleWebhook(event);
       return ResponseHelper.success(
@@ -50,6 +56,7 @@ class balanceController {
         "Webhook processed successfully"
       );
     } catch (error) {
+      console.log("🚀 ~ balanceController ~ handleWebhook ~ error:", error)
       return ResponseHelper.error(res, error.message);
     }
   }

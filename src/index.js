@@ -12,12 +12,18 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+// Don't parse JSON globally - the webhook route needs raw bodies
+// Routes will use JSON parsing individually as needed
+// app.use(express.json());
 
 app.use('/labels', express.static(path.join(__dirname, 'uploads/labels')));
 app.use('/uploads', express.static(path.join(__dirname, 'temp_data')));
-// Routes
+
+// Use routes - the webhook route is defined here with special middleware
 app.use('/api', routes);
+
+// Apply JSON parsing to all other routes that are not webhooks
+app.use(express.json());
 
 setupCleanupScheduler(); 
 
@@ -58,4 +64,4 @@ const startServer = async () => {
   }
 };
 
-startServer(); 
+startServer();

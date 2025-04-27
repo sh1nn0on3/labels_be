@@ -8,6 +8,9 @@ const balanceController = require("../controllers/balance.controller");
 const notificationController = require('../controllers/notification.controller');
 const { decryptMiddleware } = require("../middlewares/decode.middleware");
 
+// Add JSON parsing middleware for user routes
+router.use(express.json());
+
 // User routes
 router.get('/dashboard', userController.getDashboard);
 router.get("/profile", userController.getProfile);

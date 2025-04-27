@@ -11,6 +11,9 @@ const { decryptMiddleware } = require("../middlewares/decode.middleware");
 // Apply authentication and admin middleware to all routes
 router.use(authenticateToken, isAdmin);
 
+// Add JSON parsing middleware for admin routes
+router.use(express.json());
+
 // Middleware to check if the user is an admin
 router.get("/users", adminController.getUsers); 
 router.get("/user/:id", adminController.getProfileUser); 

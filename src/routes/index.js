@@ -12,6 +12,7 @@ const {
 
 // Health check route
 router.get("/ping", (req, res) => {
+  console.log("Ping received at:", new Date().toISOString());
   res.json({ status: "pong", timestamp: new Date().toISOString() });
 });
 
@@ -19,7 +20,12 @@ router.get("/ping", (req, res) => {
 // API routes
 router.use("/auth", authRoutes);
 
-router.post('/webhook', express.raw({type: 'application/json'}), balanceController.handleWebhook);
+// Using raw body for Stripe webhook 
+// This needs to be before the app uses json() middleware
+router.post('/webhook', 
+  express.raw({type: 'application/json'}), 
+  balanceController.handleWebhook
+);
 
 // User routes (protected)
 router.use("/user", authenticateToken, userRoutes);
